@@ -1,26 +1,25 @@
-async function getWeather() {
-    const city = document.getElementById('city').value;
-    const apiKey = 'YOUR_API_KEY';  // Replace with your API key from OpenWeatherMap
-    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
+const apiKey = 'd8433ad440d78d16bdd97ed604212469'; // Replace with your OpenWeatherMap API key
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+function getWeather() {
+  const city = document.getElementById('cityInput').value;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`;
 
-        if (data.cod === '404') {
-            alert('City not found');
-        } else {
-            const location = `${data.name}, ${data.sys.country}`;
-            const temperature = `${data.main.temp}°C`;
-            const description = data.weather[0].description;
-            const humidity = `Humidity: ${data.main.humidity}%`;
-
-            document.getElementById('location').innerText = location;
-            document.getElementById('temperature').innerText = temperature;
-            document.getElementById('description').innerText = description;
-            document.getElementById('humidity').innerText = humidity;
-        }
-    } catch (error) {
-        alert('Error fetching weather data');
-    }
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error("City not found");
+      return response.json();
+    })
+    .then(data => {
+      const weather = data.weather[0];
+      const temp = data.main.temp;
+      const result = `
+        <h2>${data.name}, ${data.sys.country}</h2>
+        <p><strong>${temp}°C</strong> - ${weather.description}</p>
+        <img src="https://openweathermap.org/img/wn/${weather.icon}@2x.png" alt="${weather.description}" />
+      `;
+      document.getElementById('weatherResult').innerHTML = result;
+    })
+    .catch(error => {
+      document.getElementById('weatherResult').innerHTML = `<p style="color:red;">${error.message}</p>`;
+    });
 }
